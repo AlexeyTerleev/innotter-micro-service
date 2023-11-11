@@ -37,7 +37,9 @@ CELERY_TASK_SERIALIZER = 'json'
 REDIS_HOST = os.environ.get("REDIS_HOST")
 REDIS_PORT = os.environ.get("REDIS_PORT")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '*'
+]
 
 
 # Application definition
@@ -49,6 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     'django_celery_beat',
+    'innotter',
 ]
 
 MIDDLEWARE = [
