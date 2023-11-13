@@ -1,4 +1,14 @@
-from django.http import HttpResponse
+from rest_framework import viewsets
 
-def index(request):
-    return HttpResponse("test")
+from innotter.models import Page, Post
+from innotter.serializers import PageSerializer, PostSerializer
+
+
+class PageViewSet(viewsets.ModelViewSet):
+    queryset = Page.objects.all()
+    serializer_class = PageSerializer
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
