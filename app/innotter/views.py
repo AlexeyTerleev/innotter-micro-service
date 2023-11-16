@@ -14,37 +14,6 @@ from innotter.serializers import (
 )
 from innotter.utils import get_user_info
 
-# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y
-
-# curl -X GET -H "Content-Type: application/json" \
-#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
-#       http://localhost:8000/page/1/
-
-
-# curl -X POST -H "Content-Type: application/json" \
-#        -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
-#       -d '{"name": "Page Name", "description": "Page Description"}' \
-#       http://localhost:8000/page/ 
-
-# curl -X PATCH -H "Content-Type: application/json" \
-#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
-#       -d '{"name": "TOP 5"}' \
-#       http://localhost:8000/page/17/ 
-
-# curl -X DELETE -H "Content-Type: application/json" \
-#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
-#       http://localhost:8000/page/2/ 
-
-# curl -X PATCH -H "Content-Type: application/json" \
-#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
-#       http://localhost:8000/page/1/follow
-
-
-# curl -X POST -H "Content-Type: application/json" \
-#        -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
-#       -d '{"content": "This is the post content"}' \
-#       http://localhost:8000/page/1/post/ 
-
 # TODO permissions and pagination with tags
 
 
