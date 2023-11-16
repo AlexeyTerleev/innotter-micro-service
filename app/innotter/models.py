@@ -1,5 +1,6 @@
 from django.db import models
-from django.dispatch import receiver
+
+from innotter.managers import FollowerManager, LikeManager
 
 
 class Tag(models.Model):
@@ -31,9 +32,13 @@ class Follower(models.Model):
     page = models.ForeignKey(Page, on_delete=models.CASCADE)
     user_id = models.UUIDField(null=False)
 
+    objects = FollowerManager()
+
 
 class Like(models.Model):
     post =  models.ForeignKey(Post, on_delete=models.CASCADE)
     user_id = models.UUIDField(null=False)
+
+    objects = LikeManager()
 
 
