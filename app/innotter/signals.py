@@ -1,6 +1,8 @@
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
-from innotter.models import Like, Follower
+
+from innotter.models import Follower, Like
+
 
 @receiver([post_save, post_delete], sender=Like)
 def update_post_likes(sender, instance, **kwargs):

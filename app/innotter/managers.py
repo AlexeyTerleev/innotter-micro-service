@@ -1,12 +1,13 @@
-from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
+
 
 class FollowerManager(models.Manager):
     def follow_page(self, page, user_id):
         result = None
         try:
             self.get(page=page, user_id=user_id)
-            result = False 
+            result = False
         except ObjectDoesNotExist:
             self.create(page=page, user_id=user_id)
             result = True
@@ -17,17 +18,18 @@ class FollowerManager(models.Manager):
         try:
             follower = self.get(page=page, user_id=user_id)
             follower.delete()
-            result = True 
+            result = True
         except ObjectDoesNotExist:
             result = False
         return result
-    
+
+
 class LikeManager(models.Manager):
     def like_post(self, post, user_id):
         result = None
         try:
             self.get(post=post, user_id=user_id)
-            result = False 
+            result = False
         except ObjectDoesNotExist:
             self.create(post=post, user_id=user_id)
             result = True
@@ -38,7 +40,7 @@ class LikeManager(models.Manager):
         try:
             like = self.get(post=post, user_id=user_id)
             like.delete()
-            result = True 
+            result = True
         except ObjectDoesNotExist:
             result = False
         return result

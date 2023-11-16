@@ -1,25 +1,64 @@
-from rest_framework import viewsets, mixins
+from rest_framework import mixins, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
-from innotter.models import Page, Post, Follower, Tag, Like
-from innotter.serializers import PageSerializer, PostSerializer, FollowerSerializer, TagSerializer
-from innotter.permissions import JWTAuthentication
+from innotter.models import Follower, Like, Page, Post, Tag
 from innotter.paginations import CustomPageNumberPagination
+from innotter.permissions import JWTAuthentication
+from innotter.serializers import (
+    FollowerSerializer,
+    PageSerializer,
+    PostSerializer,
+    TagSerializer,
+)
 from innotter.utils import get_user_info
 
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y
+
+# curl -X GET -H "Content-Type: application/json" \
+#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
+#       http://localhost:8000/page/1/
+
+
+# curl -X POST -H "Content-Type: application/json" \
+#        -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
+#       -d '{"name": "Page Name", "description": "Page Description"}' \
+#       http://localhost:8000/page/ 
+
+# curl -X PATCH -H "Content-Type: application/json" \
+#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
+#       -d '{"name": "TOP 5"}' \
+#       http://localhost:8000/page/17/ 
+
+# curl -X DELETE -H "Content-Type: application/json" \
+#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
+#       http://localhost:8000/page/2/ 
+
+# curl -X PATCH -H "Content-Type: application/json" \
+#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
+#       http://localhost:8000/page/1/follow
+
+
+# curl -X POST -H "Content-Type: application/json" \
+#        -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2NzI3MDksInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.JWhr8I1xyBV-96vbdHaIhq5s8-ngBu-PsxSG0O1HC6Y" \
+#       -d '{"content": "This is the post content"}' \
+#       http://localhost:8000/page/1/post/ 
+
 # TODO permissions and pagination with tags
+
 
 class FeedViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [JWTAuthentication]
     serializer_class = PostSerializer
-    
+
     def get_queryset(self):
         user_id = get_user_info(self.request).get("id")
-        following_pages = Follower.objects.filter(user_id=user_id).values_list("page_id", flat=True)
+        following_pages = Follower.objects.filter(user_id=user_id).values_list(
+            "page_id", flat=True
+        )
         return Post.objects.filter(page__in=following_pages).order_by("-created_at")
-    
+
 
 class PageViewSet(viewsets.ModelViewSet):
     permission_classes = [JWTAuthentication]
@@ -36,7 +75,7 @@ class PageViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(instance.post_set.all())
         serializer = PostSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
-    
+
     @action(detail=True, methods=["patch"])
     def follow(self, request, pk=None):
         page = self.get_object()
@@ -45,7 +84,9 @@ class PageViewSet(viewsets.ModelViewSet):
         if Follower.objects.follow_page(page, user_id):
             response = Response({"message": f"You are now following page {page.id}."})
         else:
-            response = Response({"message": f"You are already following page {page.id}."})
+            response = Response(
+                {"message": f"You are already following page {page.id}."}
+            )
         return response
 
     @action(detail=True, methods=["patch"])
@@ -58,21 +99,20 @@ class PageViewSet(viewsets.ModelViewSet):
         else:
             response = Response({"message": f"You are not following page {page.id}."})
         return response
-    
+
     @action(detail=True, methods=["get"])
     def followers(self, request, pk=None):
         page = self.get_object()
         followers = Follower.objects.filter(page=page)
         serializer = FollowerSerializer(followers, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=["patch"])
     def block(self, request, pk=None):
         page = self.get_object()
         page.blocked = True
         page.save()
         return Response({"message": f"Page {pk} has been blocked."})
-    
 
     @action(detail=True, methods=["post"])
     def post(self, request, pk=None):
@@ -84,10 +124,11 @@ class PageViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
-    
 
 
-class PostViewSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class PostViewSet(
+    mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet
+):
     permission_classes = [JWTAuthentication]
 
     queryset = Post.objects.all()
@@ -103,7 +144,7 @@ class PostViewSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.Ge
         else:
             response = Response({"message": f"You are already liked post {post.id}."})
         return response
-    
+
     @action(detail=True, methods=["patch"])
     def remove_like(self, request, pk=None):
         post = self.get_object()
@@ -114,7 +155,7 @@ class PostViewSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.Ge
         else:
             response = Response({"message": f"You are didn't liked post {post.id}."})
         return response
-    
+
 
 class TagViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = [JWTAuthentication]
