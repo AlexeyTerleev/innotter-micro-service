@@ -1,2 +1,1 @@
-
-default_app_config = 'innotter.apps.InnotterAppConfig'
+default_app_config = "innotter.apps.InnotterAppConfig"

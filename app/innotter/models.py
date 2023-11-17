@@ -1,9 +1,11 @@
 from django.db import models
-from django.dispatch import receiver
+
+from innotter.managers import FollowerManager, LikeManager
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
+
 
 class Page(models.Model):
     name = models.CharField(max_length=50, null=False)
@@ -21,7 +23,9 @@ class Page(models.Model):
 class Post(models.Model):
     page = models.ForeignKey(Page, on_delete=models.CASCADE)
     content = models.JSONField()
-    reply_to_post_id = models.PositiveBigIntegerField(default=None, blank=True, null=True)
+    reply_to_post_id = models.PositiveBigIntegerField(
+        default=None, blank=True, null=True
+    )
     likes = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -31,9 +35,11 @@ class Follower(models.Model):
     page = models.ForeignKey(Page, on_delete=models.CASCADE)
     user_id = models.UUIDField(null=False)
 
+    objects = FollowerManager()
+
 
 class Like(models.Model):
-    post =  models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user_id = models.UUIDField(null=False)
 
-
+    objects = LikeManager()

@@ -18,6 +18,7 @@ celery = "^5.3.4"
 psycopg2 = "^2.9.9"
 redis = "^5.0.1"
 django-celery-beat = "^2.5.0"
+rest-framework-simplejwt = "^0.0.2"
 
 [tool.isort]
 profile = "black"
