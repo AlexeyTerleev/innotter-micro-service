@@ -1,7 +1,8 @@
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 
 class CustomPageNumberPagination(PageNumberPagination):
-    page_query_param = "page"
+    page_size = 10
     page_size_query_param = "limit"
-    default_limit = 30
+    max_page_size = 30
