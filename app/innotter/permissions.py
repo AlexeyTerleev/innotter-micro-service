@@ -34,29 +34,25 @@ class JWTAuthentication(BasePermission):
         except (InvalidTokenError, jwt.ExpiredSignatureError):
             access = False
         return access
+    
+
+class IsAdmin(JWTAuthentication):
+    def has_access(self, request, view):
+        page = self.get_page(request, view)
+        if not page:
+            return False
+        user = get_user_info(request)
+        return admin(user)
 
 
-class IsAdminOrModeratorOrPageOwner(JWTAuthentication):
+class IsModeratorOfPageOwnerGroup(JWTAuthentication):
     def has_access(self, request, view):
         page = self.get_page(request, view)
         bearer = request.headers.get("Authorization", "")
         if not page:
             return False
         user = get_user_info(request)
-        return (
-            admin(user)
-            or page_owner(user, page)
-            or moderator_of_page_owner_group(user, page)
-        )
-
-
-class IsAdminOrModerator(JWTAuthentication):
-    def has_access(self, request, view):
-        page = self.get_page(request, view)
-        if not page:
-            return False
-        user = get_user_info(request)
-        return admin(user) or moderator_of_page_owner_group(user, page)
+        return moderator_of_page_owner_group(user, page, bearer)
 
 
 class IsPageOwner(JWTAuthentication):
@@ -76,9 +72,9 @@ def page_owner(user, page) -> bool:
     return UUID(user["id"]) == page.user_id
 
 
-def moderator_of_page_owner_group(user, page) -> bool:
+def moderator_of_page_owner_group(user, page, user_bearer) -> bool:
     return user["role"] == "Role.moderator" and page_owner_belongs_to_moderator_group(
-        page, user
+        page, user_bearer
     )
 
 

@@ -1,13 +1,12 @@
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from innotter.models import Follower, Like, Page, Post, Tag
 from innotter.paginations import CustomPageNumberPagination
 from innotter.permissions import (
-    IsAdminOrModerator,
-    IsAdminOrModeratorOrPageOwner,
+    IsAdmin,
+    IsModeratorOfPageOwnerGroup,
     IsPageOwner,
     JWTAuthentication,
 )
@@ -39,11 +38,11 @@ class PageViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         permission_classes = {
-            "destroy": [IsAdminOrModeratorOrPageOwner],
+            "destroy": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
             "partial_update": [IsPageOwner],
             "post": [IsPageOwner],
-            "followers": [IsAdminOrModeratorOrPageOwner],
-            "block": [IsAdminOrModerator],
+            "followers": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "block": [IsAdmin, IsModeratorOfPageOwnerGroup],
             "default": [JWTAuthentication],
         }
         return [
@@ -120,8 +119,8 @@ class PostViewSet(
 
     def get_permissions(self):
         permission_classes = {
-            "destroy": [IsAdminOrModeratorOrPageOwner],
-            "partial_update": [IsAdminOrModeratorOrPageOwner],
+            "destroy": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "partial_update": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
             "default": [JWTAuthentication],
         }
         return [
