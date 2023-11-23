@@ -1,11 +1,15 @@
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from innotter.models import Follower, Like, Page, Post, Tag
 from innotter.paginations import CustomPageNumberPagination
-from innotter.permissions import JWTAuthentication
+from innotter.permissions import (
+    IsAdmin,
+    IsModeratorOfPageOwnerGroup,
+    IsPageOwner,
+    JWTAuthentication,
+)
 from innotter.serializers import (
     FollowerSerializer,
     PageSerializer,
@@ -13,8 +17,6 @@ from innotter.serializers import (
     TagSerializer,
 )
 from innotter.utils import get_user_info
-
-# TODO permissions and pagination with tags
 
 
 class FeedViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -30,11 +32,25 @@ class FeedViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class PageViewSet(viewsets.ModelViewSet):
-    permission_classes = [JWTAuthentication]
-
     queryset = Page.objects.all()
     serializer_class = PageSerializer
     pagination_class = CustomPageNumberPagination
+
+    def get_permissions(self):
+        permission_classes = {
+            "destroy": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "partial_update": [IsPageOwner],
+            "post": [IsPageOwner],
+            "followers": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "block": [IsAdmin, IsModeratorOfPageOwnerGroup],
+            "default": [JWTAuthentication],
+        }
+        return [
+            permission()
+            for permission in permission_classes.get(
+                self.action, permission_classes["default"]
+            )
+        ]
 
     def perform_create(self, serializer):
         serializer.save(user_id=get_user_info(self.request).get("id"))
@@ -98,10 +114,21 @@ class PageViewSet(viewsets.ModelViewSet):
 class PostViewSet(
     mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet
 ):
-    permission_classes = [JWTAuthentication]
-
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    def get_permissions(self):
+        permission_classes = {
+            "destroy": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "partial_update": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "default": [JWTAuthentication],
+        }
+        return [
+            permission()
+            for permission in permission_classes.get(
+                self.action, permission_classes["default"]
+            )
+        ]
 
     @action(detail=True, methods=["patch"])
     def like(self, request, pk=None):
@@ -136,6 +163,14 @@ class TagViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 class TagsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [JWTAuthentication]
 
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
+    serializer_class = PageSerializer
     pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        queryset = Page.objects.all()
+
+        filter_by_name = self.request.query_params.get("filter_by_name")
+        if filter_by_name:
+            queryset = queryset.filter(tags__name=filter_by_name)
+
+        return queryset
