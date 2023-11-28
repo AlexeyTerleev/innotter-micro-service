@@ -1,6 +1,7 @@
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from datetime import datetime
 
 from innotter.models import Follower, Like, Page, Post, Tag
 from innotter.paginations import CustomPageNumberPagination
@@ -17,6 +18,15 @@ from innotter.serializers import (
     TagSerializer,
 )
 from innotter.utils import get_user_info
+
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDEzMzAwMDgsInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.DEH-sVSLqQuQpXyXkE4YD4n8rnXuM-xiY8B-0Jrw8a8
+
+# curl -X 'PATCH' \
+#       http://localhost:8000/page/22/block/ \
+#       -H "Content-Type: application/json" \
+#       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDEzMzAwMDgsInN1YiI6eyJpZCI6ImI3MzVhMjA2LTQ1YzMtNDE0ZS04MzBlLTNjMzgwNDhiYjI4MSIsImdyb3VwX2lkIjoiNmM4OGRkMzctMWIxNS00M2ViLWJkNWItNzAzNjI0M2ZmZTY0Iiwicm9sZSI6IlJvbGUuYWRtaW4ifX0.DEH-sVSLqQuQpXyXkE4YD4n8rnXuM-xiY8B-0Jrw8a8" \ 
+#       -d '{"unblock_date": "2023-11-24"}' 
+          
 
 
 class FeedViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -38,11 +48,11 @@ class PageViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         permission_classes = {
-            "destroy": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "destroy": [IsAdmin | IsModeratorOfPageOwnerGroup | IsPageOwner],
             "partial_update": [IsPageOwner],
             "post": [IsPageOwner],
-            "followers": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
-            "block": [IsAdmin, IsModeratorOfPageOwnerGroup],
+            "followers": [IsAdmin | IsModeratorOfPageOwnerGroup | IsPageOwner],
+            "block": [IsAdmin | IsModeratorOfPageOwnerGroup],
             "default": [JWTAuthentication],
         }
         return [
@@ -96,6 +106,15 @@ class PageViewSet(viewsets.ModelViewSet):
     def block(self, request, pk=None):
         page = self.get_object()
         page.blocked = True
+        unblock_date = request.data.get('unblock_date') 
+        if unblock_date:
+            try:
+                unblock_date = datetime.strptime(unblock_date, '%Y-%m-%d').date()
+                if unblock_date < datetime.now().date():
+                    return Response({"error": "Unblock date must be in the future."}, status=400)
+                page.unblock_date = unblock_date
+            except ValueError:
+                return Response({"error": "Invalid unblock date format. Expected format: YYYY-MM-DD."}, status=400)
         page.save()
         return Response({"message": f"Page {pk} has been blocked."})
 
