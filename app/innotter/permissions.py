@@ -34,7 +34,7 @@ class JWTAuthentication(BasePermission):
         except (InvalidTokenError, jwt.ExpiredSignatureError):
             access = False
         return access
-    
+
 
 class IsAdmin(JWTAuthentication):
     def has_access(self, request, view):

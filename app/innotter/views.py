@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -38,11 +40,11 @@ class PageViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         permission_classes = {
-            "destroy": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "destroy": [IsAdmin | IsModeratorOfPageOwnerGroup | IsPageOwner],
             "partial_update": [IsPageOwner],
             "post": [IsPageOwner],
-            "followers": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
-            "block": [IsAdmin, IsModeratorOfPageOwnerGroup],
+            "followers": [IsAdmin | IsModeratorOfPageOwnerGroup | IsPageOwner],
+            "block": [IsAdmin | IsModeratorOfPageOwnerGroup],
             "default": [JWTAuthentication],
         }
         return [
@@ -96,6 +98,22 @@ class PageViewSet(viewsets.ModelViewSet):
     def block(self, request, pk=None):
         page = self.get_object()
         page.blocked = True
+        unblock_date = request.data.get("unblock_date")
+        if unblock_date:
+            try:
+                unblock_date = datetime.strptime(unblock_date, "%Y-%m-%d").date()
+                if unblock_date < datetime.now().date():
+                    return Response(
+                        {"error": "Unblock date must be in the future."}, status=400
+                    )
+                page.unblock_date = unblock_date
+            except ValueError:
+                return Response(
+                    {
+                        "error": "Invalid unblock date format. Expected format: YYYY-MM-DD."
+                    },
+                    status=400,
+                )
         page.save()
         return Response({"message": f"Page {pk} has been blocked."})
 
