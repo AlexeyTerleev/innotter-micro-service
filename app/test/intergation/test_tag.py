@@ -12,6 +12,6 @@ class TestTagViewSet:
 
     def test_get(api_client, user_headers, setup_tag):
         page, tag = setup_tag
-        url = f"/tags/?filter_by_name={tag.name}"
+        url = f"/tags/?filter_by_name={tag.name}/"
         response = api_client.delete(url, headers=user_headers)
         assert response.status_code == status.HTTP_200_OK

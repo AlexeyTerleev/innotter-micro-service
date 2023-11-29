@@ -13,17 +13,17 @@ class TestPageViewSet:
         assert response.status_code == status.HTTP_200_OK
 
     def test_delete(api_client, user_headers, setup_page):
-        url = f"/page/{setup_page.id}"
+        url = f"/page/{setup_page.id}/"
         response = api_client.delete(url, headers=user_headers)
         assert response.status_code == status.HTTP_200_OK
 
     def test_get(api_client, user_headers, setup_page):
-        url = f"/page/{setup_page.id}"
+        url = f"/page/{setup_page.id}/"
         response = api_client.get(url, headers=user_headers)
         assert response.status_code == status.HTTP_200_OK
 
     def test_patch(api_client, user_headers, setup_page, faker):
-        url = f"/page/{setup_page.id}"
+        url = f"/page/{setup_page.id}/"
         data = {"description": faker.text()[:100]}
         response = api_client.patch(url, data=data, headers=user_headers)
         assert response.status_code == status.HTTP_200_OK
