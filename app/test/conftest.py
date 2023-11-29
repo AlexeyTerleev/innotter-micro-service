@@ -1,4 +1,10 @@
 import pytest
+from faker import Faker
+
+
+@pytest.fixture
+def faker():
+    return Faker()
 
 
 @pytest.fixture
@@ -15,12 +21,14 @@ def moderator_token():
 def user_token():
     return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzUxNTUsInN1YiI6eyJpZCI6ImRiMDQ3OGRjLWY2MzYtNDJmNS05ZjkxLTlhNzljODI3NzQ4NiIsImdyb3VwX2lkIjoiODEwZTg4N2QtNDhmZC00NDNiLWIxMTYtNmM0NzFmMzc0MTc4Iiwicm9sZSI6IlJvbGUudXNlciJ9fQ.YJEyYMRAH31z5hGdloZDui8xumkYBfHWDPdoCXryjFw"
 
+
 @pytest.fixture
 def admin_headers(admin_token):
     return {
         "Authorization": f"Bearer {admin_token}",
         "Content-Type": "application/json",
     }
+
 
 @pytest.fixture
 def moderator_headers(moderator_token):
@@ -29,12 +37,14 @@ def moderator_headers(moderator_token):
         "Content-Type": "application/json",
     }
 
+
 @pytest.fixture
 def user_headers(user_token):
     return {
         "Authorization": f"Bearer {user_token}",
         "Content-Type": "application/json",
     }
+
 
 @pytest.fixture
 def admin_request(mocker, admin_headers):

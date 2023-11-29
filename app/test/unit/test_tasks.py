@@ -2,7 +2,6 @@ from datetime import date, timedelta
 
 import pytest
 
-from innotter.models import Follower, Like
 from innotter.tasks import unblock_pages
 
 
