@@ -44,6 +44,7 @@ def setup_post(user_request):
 def setup_tag(user_request, faker):
     tag = Tag.objects.create(name=faker.word())
     page = Page.objects.create(
-        name=faker.word(), tags=[tag], user_id=get_user_info(user_request)["id"]
+        name=faker.word(), user_id=get_user_info(user_request)["id"]
     )
+    page.tags.add(tag)
     return page, tag

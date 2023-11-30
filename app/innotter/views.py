@@ -137,8 +137,8 @@ class PostViewSet(
 
     def get_permissions(self):
         permission_classes = {
-            "destroy": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
-            "partial_update": [IsAdmin, IsModeratorOfPageOwnerGroup, IsPageOwner],
+            "destroy": [IsAdmin | IsModeratorOfPageOwnerGroup | IsPageOwner],
+            "partial_update": [IsAdmin | IsModeratorOfPageOwnerGroup | IsPageOwner],
             "default": [JWTAuthentication],
         }
         return [
