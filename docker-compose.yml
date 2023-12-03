@@ -1,0 +1,70 @@
+version: '3.9'
+
+
+services:
+
+  app:
+    container_name: innotter-app
+    build:
+      context: .
+      network: host
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./app:/usr/src/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - celery
+      - celery-beat
+      - redis
+      - db
+
+  db:
+    container_name: innotter-db
+    image: postgres:13.7-alpine
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+
+  redis:
+    container_name: innotter-redis
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - .:/usr/src/volumes/redis
+
+  celery:
+    container_name: innotter-celery
+    restart: always
+    build:
+      context: .
+    command: celery -A app worker -l info
+    volumes:
+      - ./app:/usr/src/app
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  celery-beat:
+    container_name: innotter-celery-beat
+    restart: always
+    build:
+      context: .
+    command: celery -A app beat -l info
+    volumes:
+      - ./app:/usr/src/app
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env
+    depends_on:
+      - redis
