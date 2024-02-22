@@ -31,8 +31,7 @@ class JWTAuthentication(BasePermission):
             token = request.headers.get("Authorization", "").replace("Bearer ", "")
             decoded = jwt.decode(token, "JWT_SECRET_KEY", algorithms=["HS256"])
             access = self.has_access(request, view)
-        except (InvalidTokenError, jwt.ExpiredSignatureError) as e:
-            print(e)
+        except (InvalidTokenError, jwt.ExpiredSignatureError):
             access = False
         return access
 
