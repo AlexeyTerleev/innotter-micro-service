@@ -31,7 +31,8 @@ class JWTAuthentication(BasePermission):
             token = request.headers.get("Authorization", "").replace("Bearer ", "")
             decoded = jwt.decode(token, "JWT_SECRET_KEY", algorithms=["HS256"])
             access = self.has_access(request, view)
-        except (InvalidTokenError, jwt.ExpiredSignatureError):
+        except (InvalidTokenError, jwt.ExpiredSignatureError) as e:
+            print(e)
             access = False
         return access
 
@@ -84,5 +85,5 @@ def page_owner_belongs_to_moderator_group(page, moderator_bearer) -> bool:
         url,
         headers={"Content-Type": "application/json", "Authorization": moderator_bearer},
     )
-    response_users_ids = [user["id"] for user in response.json()]
+    response_users_ids = [UUID(user["id"]) for user in response.json()]
     return page.user_id in response_users_ids
