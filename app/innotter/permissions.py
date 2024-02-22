@@ -84,5 +84,5 @@ def page_owner_belongs_to_moderator_group(page, moderator_bearer) -> bool:
         url,
         headers={"Content-Type": "application/json", "Authorization": moderator_bearer},
     )
-    response_users_ids = [user["id"] for user in response.json()]
+    response_users_ids = [UUID(user["id"]) for user in response.json()]
     return page.user_id in response_users_ids

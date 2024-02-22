@@ -26,8 +26,8 @@ class FeedViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        user_id = get_user_info(self.request).get("id")
-        following_pages = Follower.objects.filter(user_id=user_id).values_list(
+        user = get_user_info(self.request)
+        following_pages = Follower.objects.filter(user_id=user["id"]).values_list(
             "page_id", flat=True
         )
         return Post.objects.filter(page__in=following_pages).order_by("-created_at")
